@@ -38,8 +38,8 @@ jobs:
     - name: Build the Docker image
       run: docker build --tag ${{ secrets.IMAGE_TAG }} .
 
-      name: List images
-      run: docker images
+#       name: List images
+#       run: docker images
 
       name: Login To Custom Docker Registry
       run: docker login ${{ secrets.DOCKER_REGISTRY_URL }} -u ${{ secrets.DOCKER_REGISTRY_USERNAME }} -p ${{ secrets.DOCKER_REGISTRY_PASSWORD }} 
