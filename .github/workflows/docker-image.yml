@@ -22,9 +22,10 @@
 name: Docker Build Image and Push CI
 
 on:
-  push:
-    branches:
-      - main
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
 
