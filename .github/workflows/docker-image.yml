@@ -38,19 +38,15 @@ jobs:
     - name: Build the Docker image
       run: docker build --tag ${{ secrets.IMAGE_TAG }} .
 
-    -
       name: List images
       run: docker images
 
-    - 
       name: Login To Custom Docker Registry
       run: docker login ${{ secrets.DOCKER_REGISTRY_URL }} -u ${{ secrets.DOCKER_REGISTRY_USERNAME }} -p ${{ secrets.DOCKER_REGISTRY_PASSWORD }} 
 
-    -
       name: Pushing To Custom Docker Registry
       run: docker push ${{ secrets.IMAGE_TAG }}
 
-    - 
       name: Notify Server
       uses: fjogeleit/http-request-action@v1
       with:
