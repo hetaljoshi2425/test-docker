@@ -1,25 +1,4 @@
-# name: Docker Image CI
-
-# on:
-#   push:
-#     branches: [ "main" ]
-#   pull_request:
-#     branches: [ "main" ]
-
-# jobs:
-
-#   build:
-
-#     runs-on: ubuntu-latest
-
-#     steps:
-#     - uses: actions/checkout@v3
-#     - name: Build the Docker image
-#       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
-
-
-
-name: Docker Build Image and Push CI
+name: Docker Image CI
 
 on:
   push:
@@ -29,27 +8,11 @@ on:
 
 jobs:
 
-  build_and_push:
+  build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build --tag ${{ secrets.IMAGE_TAG }} .
-
-#       name: List images
-#       run: docker images
-
-      name: Login To Custom Docker Registry
-      run: docker login ${{ secrets.DOCKER_REGISTRY_URL }} -u ${{ secrets.DOCKER_REGISTRY_USERNAME }} -p ${{ secrets.DOCKER_REGISTRY_PASSWORD }} 
-
-      name: Pushing To Custom Docker Registry
-      run: docker push ${{ secrets.IMAGE_TAG }}
-
-      name: Notify Server
-      uses: fjogeleit/http-request-action@v1
-      with:
-        url: ${{ secrets.WEBHOOK_URL }}
-        method: 'POST'
-        preventFailureOnNoResponse: true
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
