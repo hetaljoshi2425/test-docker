@@ -1,18 +1,44 @@
-name: Docker Image CI
+# name: Docker Image CI
+
+# on:
+#   push:
+#     branches: [ "main" ]
+
+# jobs:
+
+#   build:
+
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - uses: actions/checkout@v3
+#     - name: Build the Docker image
+#       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+
+
+name: CI/CD for React App
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-
-  build:
-
-    runs-on: ubuntu-latest
+  deploy:
+    runs-on: self-hosted
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t my-react-app:latest .
+          docker tag my-react-app:latest my-docker-registry/my-react-app:latest
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker push my-docker-registry/my-react-app:latest
+
+      - name: Deploy to Server
+        run: |
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} user@your_server_ip "docker pull my-docker-registry/my-react-app:latest"
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} user@your_server_ip "docker run -d -p 80:80 my-docker-registry/my-react-app:latest"
