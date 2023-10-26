@@ -87,4 +87,5 @@ jobs:
         sudo apt-get install -y docker-compose
 
     - name: Deploy with Docker Compose
-      run: docker-compose -f docker-compose.yml up -d
+      run: docker-compose -f ./docker-compose.yml up -d
+
