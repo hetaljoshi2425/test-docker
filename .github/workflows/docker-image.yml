@@ -45,7 +45,51 @@
 
 
 
-name: Auto Deploy
+# name: Auto Deploy
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Checkout Repository
+#       uses: actions/checkout@v2
+
+#     - name: Set up Docker Buildx
+#       uses: docker/setup-buildx-action@v1
+
+#     - name: Login to Docker Hub
+#       uses: docker/login-action@v1
+#       with:
+#         username: ${{ secrets.DOCKER_USERNAME }}
+#         password: ${{ secrets.DOCKER_PASSWORD }}
+
+#     - name: Build and Push Docker Image
+#       id: docker_build
+#       uses: docker/build-push-action@v2
+#       with:
+#         context: .
+#         push: true
+#         tags: hetaljoshi2425/my-tst:latest
+
+#   deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Set up Docker Compose
+#       run: |
+#         sudo apt-get update
+#         sudo apt-get install -y docker-compose
+
+
+
+
+name: CI/CD with Docker
 
 on:
   push:
@@ -57,32 +101,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+      - name: Build Docker image
+        run: docker build -t your-image-name .
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Push Docker image to registry
+        run: |
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker tag your-image-name your-registry/your-image-name
+          docker push your-registry/your-image-name
 
-    - name: Build and Push Docker Image
-      id: docker_build
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        push: true
-        tags: hetaljoshi2425/my-tst:latest
+      - name: SSH into Server and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker stop your-container-name || true
+            docker rm your-container-name || true
+            docker pull your-registry/your-image-name
+            docker run -d -p 80:80 --name your-container-name your-registry/your-image-name
 
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Set up Docker Compose
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y docker-compose
 
