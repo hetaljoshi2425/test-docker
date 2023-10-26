@@ -75,7 +75,8 @@ jobs:
       with:
         context: .
         push: true
-        tags: your-dockerhub-username/your-app-name:latest
+        tags: 
+hetaljoshi2425/your-app-name:latest
 
   deploy:
     runs-on: ubuntu-latest
