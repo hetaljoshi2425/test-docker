@@ -164,10 +164,6 @@
 #             docker run -d -p 80:80 --name your-container-name your-registry/your-image-name
 
 
-
-name: CI/CD for React App
-
-
 name: Docker Build and Deploy
 
 on:
