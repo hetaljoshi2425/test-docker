@@ -186,11 +186,10 @@ jobs:
 
     - name: Build React app
       run: |
-        cd root/test-docker
+        cd test-docker 
         npm install
         npm run build
-      working-directory: test-docker
-
+      working-directory: ./
 
     - name: Copy build files to server
       uses: actions/checkout@v2
@@ -199,7 +198,7 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         source: ./test-docker/build/
-        target: root/test-docker
+        target: /root/test-docker
 
 
     - name: SSH into server and deploy
@@ -209,7 +208,7 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
-          cd root/test-docker
+          cd /root/test-docker
           docker-compose -f docker-compose.yml down
           docker-compose -f docker-compose.yml pull
           docker-compose -f docker-compose.yml up -d
