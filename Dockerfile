@@ -47,31 +47,26 @@
 # Use an official Node.js runtime as the base image
 FROM node:16
 
-
 # Set the working directory in the container
-WORKDIR /test-docker
-
+WORKDIR /app
 
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 
-
-# Install application dependencies
+# Install app dependencies
 RUN npm install
 
-
-# Copy all application files to the container
-COPY . .
-
-
-# Build the React application
+#  Build the React app
 RUN npm run build
 
+# Copy the rest of the application source code
+COPY . .
 
-# Expose the port your app runs on
+# Expose a port for the application to listen on
 EXPOSE 3000
 
+# Define the command to run your application
+CMD [ "npm", "start" ]
 
-# Command to run your application
-CMD ["npm", "start"]
+
 
