@@ -122,7 +122,6 @@ jobs:
           port: 22
           script_stop: true
           script: ls -all
-          script: |
             docker stop your-container-name || true
             docker rm your-container-name || true
             docker pull your-registry/your-image-name
