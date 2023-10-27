@@ -186,7 +186,6 @@ jobs:
 
     - name: Build React app
       run: |
-        cd test-docker 
         npm install
         npm run build
       working-directory: ./
