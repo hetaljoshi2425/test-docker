@@ -125,42 +125,91 @@
 
 
 
-name: CI/CD with Docker
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+
+#       - name: Set up SSH key
+#         run: |
+#           mkdir -p ~/.ssh
+#           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+#           chmod 600 ~/.ssh/id_rsa
+#           ssh-add ~/.ssh/id_rsa
+#         env:
+#           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+
+#       - name: Build Docker image
+#         run: docker build -t your-image-name .
+
+#       - name: Push Docker image to registry
+#         run: |
+#           echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+#           docker tag your-image-name hetaljoshi2425/your-image-name
+#           docker push hetaljoshi2425/your-image-name
+
+#       - name: SSH into Server and Deploy
+#         uses: appleboy/ssh-action@master
+#         with:
+#           host: ${{ secrets.SERVER_HOST }}
+#           username: ${{ secrets.SERVER_USER }}
+#           key: ${{ secrets.SERVER_SSH_KEY }} # You may not need this line if you're using agent authentication
+#           script: |
+#             docker stop your-container-name || true
+#             docker rm your-container-name || true
+#             docker pull your-registry/your-image-name
+#             docker run -d -p 80:80 --name your-container-name your-registry/your-image-name
+
+
+
+name: CI/CD for React App
+
 
 on:
   push:
     branches:
       - main
 
+
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up SSH key
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
 
-      - name: Build Docker image
-        run: docker build -t your-image-name .
+    - name: Build React app
+      run: |
+        cd app # Change to the directory where your React app source code is
+        npm install
+        npm run build
+      working-directory: ./test-docker
 
-      - name: Push Docker image to registry
-        run: |
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          docker tag your-image-name hetaljoshi2425/your-image-name
-          docker push hetaljoshi2425/your-image-name
 
-      - name: SSH into Server and Deploy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          script: |
-            docker stop your-container-name || true
-            docker rm your-container-name || true
-            docker pull your-registry/your-image-name
-            docker run -d -p 80:80 --name your-container-name your-registry/your-image-name
+    - name: Copy build files to server
+      uses: hetaljoshi2425/scp-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        source: ./test-docker/build/
+        target: /root/test-docker
+
+
+    - name: SSH into server and deploy
+      uses: hetaljoshi2425/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          cd /root/test-docker
+          docker-compose -f docker-compose.yml down
+          docker-compose -f docker-compose.yml pull
+          docker-compose -f docker-compose.yml up -d
