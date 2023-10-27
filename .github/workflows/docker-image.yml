@@ -189,7 +189,7 @@ jobs:
         cd root/test-docker
         npm install
         npm run build
-      working-directory: ./test-docker
+      working-directory: test-docker
 
 
     - name: Copy build files to server
