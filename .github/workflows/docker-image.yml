@@ -40,7 +40,7 @@ jobs:
 
       - name: Deploy to Server
         run: |
-        ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest && docker run -d -p 80:80 --name my-react-app hetaljoshi2425/my-react-app:latest" > deployment.log 2>&1
+          ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest && docker run -d -p 80:80 --name my-react-app hetaljoshi2425/my-react-app:latest" > deployment.log 2>&1
           # ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest && docker run -d -p 80:80 --name my-react-app hetaljoshi2425/my-react-app:latest"
           # ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest"
           # ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker run -d -p 80:80 hetaljoshi2425/my-react-app:latest"
