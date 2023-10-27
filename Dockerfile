@@ -19,8 +19,7 @@
 
 
 # Use an official Node.js runtime as a base image
-FROM node:17.9.0
-ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true
+FROM node:16
 
 # Set the working directory in the container
 WORKDIR /app
