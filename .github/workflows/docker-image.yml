@@ -16,32 +16,32 @@
 # #       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
 
 
-# name: CI/CD for React App
+name: CI/CD for React App
 
-# on:
-#   push:
-#     branches:
-#       - main
+on:
+  push:
+    branches:
+      - main
 
-# jobs:
-#   deploy:
-#     runs-on: self-hosted
+jobs:
+  deploy:
+    runs-on: self-hosted
 
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-#       - name: Build and push Docker image
-#         run: |
-#           docker build -t my-react-app:latest .
-#           docker tag my-react-app:latest my-docker-registry/my-react-app:latest
-#           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-#           docker push my-docker-registry/my-react-app:latest
+      - name: Build and push Docker image
+        run: |
+          docker build -t my-react-app:latest .
+          docker tag my-react-app:latest hetaljoshi2425/my-react-app:latest
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker push hetaljoshi2425/my-react-app:latest
 
-#       - name: Deploy to Server
-#         run: |
-#           ssh -i ${{ secrets.SSH_PRIVATE_KEY }} user@your_server_ip "docker pull my-docker-registry/my-react-app:latest"
-#           ssh -i ${{ secrets.SSH_PRIVATE_KEY }} user@your_server_ip "docker run -d -p 80:80 my-docker-registry/my-react-app:latest"
+      - name: Deploy to Server
+        run: |
+          ssh -i ${{ secrets.SERVER_SSK_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest"
+          ssh -i ${{ secrets.SERVER_SSK_KEY }} root@139.84.192.213 "docker run -d -p 80:80 hetaljoshi2425/my-react-app:latest"
 
 
 
@@ -164,36 +164,36 @@
 #             docker run -d -p 80:80 --name your-container-name your-registry/your-image-name
 
 
-name: Docker Build and Deploy
+# name: Docker Build and Deploy
 
-on:
-  push:
-    branches:
-      - main  # Branch jahan se aap deploy karna chahte hain
+# on:
+#   push:
+#     branches:
+#       - main  # Branch jahan se aap deploy karna chahte hain
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+# jobs:
+#   build-and-deploy:
+#     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+#     steps:
+#     - name: Checkout Repository
+#       uses: actions/checkout@v2
 
-    - name: Login to Docker Hub
-      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+#     - name: Login to Docker Hub
+#       run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build Docker Image
-      run: docker build -t hetaljoshi2425/your-repo-name:latest .
+#     - name: Build Docker Image
+#       run: docker build -t hetaljoshi2425/your-repo-name:latest .
 
-    - name: Push Docker Image
-      run: docker push hetaljoshi2425/your-repo-name:latest
+#     - name: Push Docker Image
+#       run: docker push hetaljoshi2425/your-repo-name:latest
 
-    - name: SSH Deploy to Server
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        script: |
-          docker pull hetaljoshi2425/your-repo-name:latest
-          docker run -d -p 80:80 hetaljoshi2425/your-repo-name:latest
+#     - name: SSH Deploy to Server
+#       uses: appleboy/ssh-action@master
+#       with:
+#         host: ${{ secrets.SERVER_HOST }}
+#         username: ${{ secrets.SERVER_USERNAME }}
+#         key: ${{ secrets.SERVER_SSH_KEY }}
+#         script: |
+#           docker pull hetaljoshi2425/your-repo-name:latest
+#           docker run -d -p 80:80 hetaljoshi2425/your-repo-name:latest
