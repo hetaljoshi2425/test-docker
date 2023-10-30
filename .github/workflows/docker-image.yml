@@ -38,7 +38,7 @@ jobs:
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker push hetaljoshi2425/my-react-app:latest
 
-        - name: Pull Docker image
+      - name: Pull Docker image
         uses: docker/build-push-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -91,7 +91,7 @@ jobs:
 #     runs-on: ubuntu-latest
 
 #     steps:
-#     - name: Set up Docker Compose
+#    - name: Set up Docker Compose
 #       run: |
 #         sudo apt-get update
 #         sudo apt-get install -y docker-compose
