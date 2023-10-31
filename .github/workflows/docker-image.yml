@@ -41,7 +41,7 @@ jobs:
       - name: Set up SSH connection
         uses: webfactory/ssh-agent@v0.5.4
         with:
-          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+          # ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
           known-hosts: ${{ secrets.SERVER_HOST }}
           ssh-public-key: ${{ secrets.SERVER_SSH_PUBLIC_KEY }}
 
