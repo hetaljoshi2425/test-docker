@@ -38,22 +38,38 @@ jobs:
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker push hetaljoshi2425/my-react-app:latest
 
-      - name: Set up SSH connection
-        uses: webfactory/ssh-agent@v0.5.4
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0
         with:
           ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
-          known-hosts: ${{ secrets.SERVER_HOST }}
-          ssh-public-key: ${{ secrets.SERVER_SSH_PUBLIC_KEY }}
+          ssh-known-hosts: |
+          github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
 
-      - name: Pull Docker image on server
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 'docker pull my-react-app:latest'
+      - name: Log into Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Deploy to Server
-        run: |
-          ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest && docker run -d -p 80:80 --name my-react-app hetaljoshi2425/my-react-app:latest" > deployment.log 2>&1
-          # ssh -v -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest && docker run -d -p 80:80 --name my-react-app hetaljoshi2425/my-react-app:latest"          # ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest"
-          # ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker run -d -p 80:80 hetaljoshi2425/my-react-app:latest"
+      - name: Pull Docker Image
+        run: docker pull hetaljoshi2425/my-react-app:latest
+
+      - name: Deploy Docker Container
+        run: ssh root@139.84.192.213 "docker run -d -p 80:80 hetaljoshi2425/my-react-app:latest"
+
+      # - name: Set up SSH connection
+      #   uses: webfactory/ssh-agent@v0.5.4
+      #   with:
+      #     ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+      #     known-hosts: ${{ secrets.SERVER_HOST }}
+      #     ssh-public-key: ${{ secrets.SERVER_SSH_PUBLIC_KEY }}
+
+      # - name: Pull Docker image on server
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 'docker pull my-react-app:latest'
+
+      # - name: Deploy to Server
+      #   run: |
+      #     ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest && docker run -d -p 80:80 --name my-react-app hetaljoshi2425/my-react-app:latest" > deployment.log 2>&1
+      #     # ssh -v -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest && docker run -d -p 80:80 --name my-react-app hetaljoshi2425/my-react-app:latest"          # ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest"
+      #     # ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker run -d -p 80:80 hetaljoshi2425/my-react-app:latest"
 
 
 
