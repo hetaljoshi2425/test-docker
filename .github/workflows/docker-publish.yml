@@ -253,8 +253,8 @@ jobs:
             install -m 600 -D /dev/null ~/.ssh/id_rsa
             echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
             ssh-keyscan -H ${{ secrets.SERVER_HOST }} > ~/.ssh/known_hosts
-        - name: Deploy with rsync
-          run: ssh -o StrictHostKeyChecking=no user@139.84.192.213
+        # - name: Deploy with rsync
+        #   run: ssh -o StrictHostKeyChecking=no user@139.84.192.213
 
         # - name: Setup SSH connection
         #   uses: webfactory/ssh-agent@v0.5
