@@ -250,9 +250,11 @@ jobs:
           # <https://stackoverflow.com/a/70447517>
 
           run: |
-            install -m 600 -D /dev/null ~/.ssh/id_rsa
-            echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
-            ssh-keyscan -H ${{ secrets.SERVER_HOST }} > ~/.ssh/known_hosts
+            # install -m 600 -D /dev/null ~/.ssh/id_rsa
+            # echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+            # ssh-keyscan -H ${{ secrets.SERVER_HOST }} > ~/.ssh/known_hosts
+            eval `ssh-agent -s`
+            echo "${{ secrets.SERVER_SSH_KEY }}" | ssh-add -
         # - name: Deploy with rsync
         #   run: ssh -o StrictHostKeyChecking=no user@139.84.192.213
 
