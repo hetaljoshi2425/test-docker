@@ -251,10 +251,16 @@ jobs:
 
           run: |
             install -m 600 -D /dev/null ~/.ssh/id_rsa
-            echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-            echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+            echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+            ssh-keyscan -H ${{ secrets.SERVER_HOST }} > ~/.ssh/known_hosts
         - name: Deploy with rsync
           run: ssh -o StrictHostKeyChecking=no user@139.84.192.213
+
+        # - name: Setup SSH connection
+        #   uses: webfactory/ssh-agent@v0.5
+        #   with:
+        #   ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        #   ssh-public-key: ${{ secrets.SSH_PUBLIC_KEY }}
 
         - name: connect and pull
           run: ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd ${{ secrets.WORK_DIR }} && docker compose pull && docker compose up -d && exit"
