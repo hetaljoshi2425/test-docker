@@ -213,57 +213,95 @@
 
 
 
-name: publish
+# name: publish
+
+# on:
+#   push:
+#     branches: [ "main" ]
+
+# env:
+#   # Use docker.io for Docker Hub if empty
+#   REGISTRY: ghcr.io
+#   IMAGE_NAME: ${{ github.actor }}/new-test:latest
+
+# jobs:
+#     publish:
+#         name: publish image
+#         runs-on: ubuntu-latest
+
+#         steps:
+#         - uses: actions/checkout@v3
+#         - name: Login
+#           run: |
+#             echo ${{ secrets.PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+#         - name: Build and Publish
+#           run: |
+#             docker build . --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+#             docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+#     deploy:
+#         needs: publish
+#         name: deploy image
+#         runs-on: ubuntu-latest
+
+#         steps:
+#         - name: install ssh keys
+#           # check this thread to understand why its needed:
+#           # <https://stackoverflow.com/a/70447517>
+
+#           run: |
+#               eval `ssh-agent -s`
+#               # install -m 600 -D /dev/null ~/.ssh/id_rsa
+#               echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+#               ssh-keyscan -H ${{ secrets.SERVER_HOST }} > ~/.ssh/known_hosts
+#         # - name: Deploy with rsync
+#         #   run: ssh -o StrictHostKeyChecking=no user@139.84.192.213
+
+#         # - name: Setup SSH connection
+#         #   uses: webfactory/ssh-agent@v0.5
+#         #   with:
+#         #   ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+#         #   ssh-public-key: ${{ secrets.SSH_PUBLIC_KEY }}
+
+#         - name: connect and pull
+#           run: ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd ${{ secrets.WORK_DIR }} && docker compose pull && docker compose up -d && exit"
+#         - name: cleanup
+          # run: rm -rf ~/.ssh
+
+
+
+
+name: Docker Deployment
 
 on:
   push:
-    branches: [ "main" ]
-
-env:
-  # Use docker.io for Docker Hub if empty
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.actor }}/new-test:latest
+    branches:
+      - main
 
 jobs:
-    publish:
-        name: publish image
-        runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
 
-        steps:
-        - uses: actions/checkout@v3
-        - name: Login
-          run: |
-            echo ${{ secrets.PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        - name: Build and Publish
-          run: |
-            docker build . --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-            docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    deploy:
-        needs: publish
-        name: deploy image
-        runs-on: ubuntu-latest
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
-        steps:
-        - name: install ssh keys
-          # check this thread to understand why its needed:
-          # <https://stackoverflow.com/a/70447517>
+      - name: Build Docker image
+        run: docker build -t test-new-app:latest .
 
-          run: |
-              eval `ssh-agent -s`
-              # install -m 600 -D /dev/null ~/.ssh/id_rsa
-              echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
-              ssh-keyscan -H ${{ secrets.SERVER_HOST }} > ~/.ssh/known_hosts
-        # - name: Deploy with rsync
-        #   run: ssh -o StrictHostKeyChecking=no user@139.84.192.213
+      - name: Push Docker image
+        run: docker push test-new-app:latest
 
-        # - name: Setup SSH connection
-        #   uses: webfactory/ssh-agent@v0.5
-        #   with:
-        #   ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-        #   ssh-public-key: ${{ secrets.SSH_PUBLIC_KEY }}
+      - name: SSH into the server and deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker pull test-new-app:latest
+            docker-compose -f /root/test-docker/_work/test-docker/test-docker/docker-compose.yml up -d
 
-        - name: connect and pull
-          run: ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd ${{ secrets.WORK_DIR }} && docker compose pull && docker compose up -d && exit"
-        - name: cleanup
-          run: rm -rf ~/.ssh
