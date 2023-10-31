@@ -50,7 +50,7 @@ jobs:
         run: docker pull hetaljoshi2425/my-react-app:latest
 
       - name: Deploy Docker Container
-          ssh -i /root/.ssh/id_rsa root@139.84.192.213 "docker run -d -p 80:80 hetaljoshi2425/my-react-app:latest"
+        run: ssh -i /root/.ssh/id_rsa root@139.84.192.213 "docker run -d -p 80:80 hetaljoshi2425/my-react-app:latest"
 
       # - name: Set up SSH connection
       #   uses: webfactory/ssh-agent@v0.5.4
