@@ -16,58 +16,58 @@
 # #       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
 
 
-# name: CI/CD for React App
+name: CI/CD for React App
 
-# on:
-#   push:
-#     branches:
-#       - main
+on:
+  push:
+    branches:
+      - main
 
-# jobs:
-#   deploy:
-#     runs-on: self-hosted
+jobs:
+  deploy:
+    runs-on: self-hosted
 
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-#       - name: Build and push Docker image
-#         run: |
-#           docker build -t my-react-app:latest .
-#           docker tag my-react-app:latest hetaljoshi2425/my-react-app:latest
-#           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-#           docker push hetaljoshi2425/my-react-app:latest
+      - name: Build and push Docker image
+        run: |
+          docker build -t my-react-app:latest .
+          docker tag my-react-app:latest hetaljoshi2425/my-react-app:latest
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker push hetaljoshi2425/my-react-app:latest
 
-#       - name: Setup SSH
-#         uses: webfactory/ssh-agent@v0.5.4
-#         with:
-#           ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
 
-#       - name: Log into Docker Hub
-#         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Log into Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
-#       - name: Pull Docker Image
-#         run: docker pull hetaljoshi2425/my-react-app:latest
+      - name: Pull Docker Image
+        run: docker pull hetaljoshi2425/my-react-app:latest
 
-#       - name: Deploy Docker Container
-#         run: ssh -i /root/.ssh/id_rsa root@139.84.192.213 "docker run -d -p 80:80 hetaljoshi2425/my-react-app:latest"
+      - name: Deploy Docker Container
+        run: ssh -i /root/.ssh/id_rsa root@139.84.192.213 "docker run -d -p 80:80 hetaljoshi2425/my-react-app:latest"
 
-      # - name: Set up SSH connection
-      #   uses: webfactory/ssh-agent@v0.5.4
-      #   with:
-      #     ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
-      #     known-hosts: ${{ secrets.SERVER_HOST }}
-      #     ssh-public-key: ${{ secrets.SERVER_SSH_PUBLIC_KEY }}
+      - name: Set up SSH connection
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+          known-hosts: ${{ secrets.SERVER_HOST }}
+          ssh-public-key: ${{ secrets.SERVER_SSH_PUBLIC_KEY }}
 
-      # - name: Pull Docker image on server
-      #   run: |
-      #     ssh -o StrictHostKeyChecking=no -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 'docker pull my-react-app:latest'
+      - name: Pull Docker image on server
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 'docker pull my-react-app:latest'
 
-      # - name: Deploy to Server
-      #   run: |
-      #     ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest && docker run -d -p 80:80 --name my-react-app hetaljoshi2425/my-react-app:latest" > deployment.log 2>&1
-      #     # ssh -v -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest && docker run -d -p 80:80 --name my-react-app hetaljoshi2425/my-react-app:latest"          # ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest"
-      #     # ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker run -d -p 80:80 hetaljoshi2425/my-react-app:latest"
+      - name: Deploy to Server
+        run: |
+          ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest && docker run -d -p 80:80 --name my-react-app hetaljoshi2425/my-react-app:latest" > deployment.log 2>&1
+          # ssh -v -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest && docker run -d -p 80:80 --name my-react-app hetaljoshi2425/my-react-app:latest"          # ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker pull hetaljoshi2425/my-react-app:latest"
+          # ssh -i ${{ secrets.SERVER_SSH_KEY }} root@139.84.192.213 "docker run -d -p 80:80 hetaljoshi2425/my-react-app:latest"
 
 
 
@@ -320,46 +320,46 @@
 #             docker-compose -f /root/test-docker/_work/test-docker/test-docker/docker-compose.yml up -d
 
 
-name: publish
+# name: publish
 
-on:
-  push:
-    branches: [ "main" ]
+# on:
+#   push:
+#     branches: [ "main" ]
 
-env:
-  # Use docker.io for Docker Hub if empty
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.actor }}/new-test:latest
+# env:
+#   # Use docker.io for Docker Hub if empty
+#   REGISTRY: ghcr.io
+#   IMAGE_NAME: ${{ github.actor }}/new-test:latest
 
-jobs:
-    publish:
-        name: publish image
-        runs-on: ubuntu-latest
+# jobs:
+#     publish:
+#         name: publish image
+#         runs-on: ubuntu-latest
 
-        steps:
-        - uses: actions/checkout@v3
-        - name: Login
-          run: |
-            echo ${{ secrets.PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        - name: Build and Publish
-          run: |
-            docker build . --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-            docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+#         steps:
+#         - uses: actions/checkout@v3
+#         - name: Login
+#           run: |
+#             echo ${{ secrets.PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+#         - name: Build and Publish
+#           run: |
+#             docker build . --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+#             docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-    deploy:
-        needs: publish
-        name: deploy image
-        runs-on: ubuntu-latest
+#     deploy:
+#         needs: publish
+#         name: deploy image
+#         runs-on: ubuntu-latest
 
-        steps:
-        - name: install ssh keys
-          # check this thread to understand why its needed:
-          # <https://stackoverflow.com/a/70447517>
-          run: |
-            install -m 600 -D /dev/null ~/.ssh/id_rsa
-            echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
-            ssh-keyscan -H ${{ secrets.SERVER_HOST }} > ~/.ssh/known_hosts
-        - name: connect and pull
-          run: ssh -i ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd ${{ secrets.WORK_DIR }} && docker compose pull && docker compose up -d && exit"
-        - name: cleanup
-          run: rm -rf ~/.ssh
+#         steps:
+#         - name: install ssh keys
+#           # check this thread to understand why its needed:
+#           # <https://stackoverflow.com/a/70447517>
+#           run: |
+#             install -m 600 -D /dev/null ~/.ssh/id_rsa
+#             echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+#             ssh-keyscan -H ${{ secrets.SERVER_HOST }} > ~/.ssh/known_hosts
+#         - name: connect and pull
+#           run: ssh -i ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd ${{ secrets.WORK_DIR }} && docker compose pull && docker compose up -d && exit"
+#         - name: cleanup
+#           run: rm -rf ~/.ssh
